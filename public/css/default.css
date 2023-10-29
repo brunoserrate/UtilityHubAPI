@@ -16,6 +16,7 @@ body {
     padding: 20px;
     text-align: center;
     width: 300px;
+    word-wrap: break-word;
 }
 
 /* Estilos dos inputs */

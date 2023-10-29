@@ -1,3 +1,9 @@
+<?php
+session_start();
+
+$_SESSION["requested_via_browser"] = true;
+?>
+
 <!-- Registrar -->
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +14,7 @@
     <title>Utility Hub API - Registrar</title>
 
     <!-- Import css -->
-    <link rel="stylesheet" href="../../utils/css/default.css">
+    <link rel="stylesheet" href="../../public/css/default.css">
 </head>
 
 <script>
@@ -38,9 +44,7 @@
         <p>Parar criar uma nova conta, preencha todos os campos a seguir</p>
         <br>
 
-        <!-- TODO: Incluir action -->
-        <form method="post" action="" onsubmit="return validateRegistrarForm()">
-
+        <form method="post" action="../../api/users/register/" onsubmit="return validateRegistrarForm()">
             <input class="input" type="text" placeholder="Nome completo" name="name" required>
             <input class="input" type="text" placeholder="E-mail" name="email" required>
             <input class="input" type="password" placeholder="Senha" name="password" required>

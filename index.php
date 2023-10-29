@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Utility Hub API</title>
 
-    <link rel="stylesheet" href="../../utils/css/default.css">
+    <link rel="stylesheet" href="../../public/css/default.css">
 
 </head>
 

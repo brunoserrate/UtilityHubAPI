@@ -1,0 +1,59 @@
+<?php
+
+/*
+    Data Structure:
+    [
+        'purpose' => [
+            'context' => [
+                'key/code' => 'message',
+            ]
+        ],
+    ]
+
+    Example:
+    [
+        'error' => [
+            'users' => [
+                'users_empty' => 'Please fill all the fields.',
+                'users_not_found' => 'User not found.',
+                'users_not_activated' => 'User not activated.',
+            ],
+        ],
+    ]
+
+    Explenation:
+     - purpose: The purpose of the message, for example: error, success, warning, general, etc.
+        - context: The context of the message, for example: users, posts, comments, etc.
+            - key/code: The key or code of the message, for example: users_empty, users_not_found, users_not_activated, etc.
+                - message: The message itself, for example: Please fill all the fields, User not found, User not activated, etc.
+*/
+return [
+    'error' => [
+        'general' => [
+            'method_not_allowed' => 'Method not allowed.',
+        ],
+        'users' => [
+            'users_empty' => 'Please fill all the fields.',
+            'users_not_found' => 'User not found.',
+            'users_not_activated' => 'User not activated.',
+            'users_password_incorrect' => 'Password incorrect.',
+            'users_token_not_generated' => 'Token not generated.',
+            'users_passwords_dont_match' => 'Passwords don\'t match.',
+            'users_invalid_email' => 'Invalid email.',
+        ],
+    ],
+    'success' => [
+        'users' => [
+            'users_logged_in' => 'User logged in.',
+            'user_registered' => 'User registered.',
+        ],
+    ],
+    'return_keys' => [
+        'success' => 'success',
+        'status' => 'status',
+        'message' => 'message',
+        'data' => 'data',
+        'response_time' => 'response_time',
+    ],
+];
+
