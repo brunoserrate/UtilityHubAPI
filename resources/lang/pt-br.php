@@ -32,6 +32,7 @@ return [
         'general' => [
             'method_not_allowed' => 'Método não permitido.',
             'fail_retrieving_data' => 'Falha ao recuperar dados.',
+            'parameters_empty' => 'Parâmetros não podem ser vazios.',
         ],
         'users' => [
             'users_empty' => 'Por favor, preencha todos os campos.',
@@ -51,6 +52,7 @@ return [
             'users_logged_in' => 'Usuário logado.',
             'user_registered' => 'Usuário registrado.',
             'user_updated' => 'Usuário atualizado.',
+            'user_desactivated' => 'Usuário desativado.',
         ],
     ],
     'return_keys' => [

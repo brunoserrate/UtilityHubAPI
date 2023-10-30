@@ -32,6 +32,7 @@ return [
         'general' => [
             'method_not_allowed' => 'Method not allowed.',
             'fail_retrieving_data' => 'Fail retrieving data.',
+            'parameters_empty' => 'Parameters cannot be empty.',
         ],
         'users' => [
             'users_empty' => 'Please fill all the fields.',
@@ -51,6 +52,7 @@ return [
             'users_logged_in' => 'User logged in.',
             'user_registered' => 'User registered.',
             'user_updated' => 'User updated.',
+            'user_desactivated' => 'User desactivated.',
         ],
     ],
     'return_keys' => [
