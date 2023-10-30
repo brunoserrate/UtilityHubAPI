@@ -25,13 +25,16 @@ $authorization = isset($headers['Authorization']) ? $headers['Authorization'] : 
 if (!isset($_SESSION["requested_via_browser"]) || !$_SESSION["requested_via_browser"]) {
     $query = $_SERVER['QUERY_STRING'];
 
-    if (empty($query)) {
+    if (!empty($query)) {
 
         $query = explode('&', $query);
         $queryData = [];
 
-        foreach ($query as $key => $value) {
-            $queryData[$key] = explode('=', $value);
+        foreach ($query as $value) {
+            $key = explode('=', $value)[0];
+            $queryValue = explode('=', $value)[1];
+
+            $queryData[$key] = $queryValue;
         }
 
         $id = isset($queryData["id"]) ? $queryData["id"] : 0;
