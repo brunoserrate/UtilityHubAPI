@@ -31,6 +31,7 @@ return [
     'error' => [
         'general' => [
             'method_not_allowed' => 'Method not allowed.',
+            'fail_retrieving_data' => 'Fail retrieving data.',
         ],
         'users' => [
             'users_empty' => 'Please fill all the fields.',
@@ -41,11 +42,15 @@ return [
             'users_passwords_dont_match' => 'Passwords don\'t match.',
             'users_invalid_email' => 'Invalid email.',
         ],
+        'token' => [
+            'token_not_found' => 'Token not found.',
+        ]
     ],
     'success' => [
         'users' => [
             'users_logged_in' => 'User logged in.',
             'user_registered' => 'User registered.',
+            'user_updated' => 'User updated.',
         ],
     ],
     'return_keys' => [

@@ -22,6 +22,7 @@ class TokenModel extends AbastractModel
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             token TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );";
@@ -36,7 +37,8 @@ class TokenModel extends AbastractModel
         $this->insert(
             [
                 'user_id' => $userId,
-                'token' => $token
+                'token' => $token,
+                'expires_at' => date('Y-m-d H:i:s', strtotime('+2 hours'))
             ]
         );
 

@@ -31,6 +31,7 @@ return [
     'error' => [
         'general' => [
             'method_not_allowed' => 'Método não permitido.',
+            'fail_retrieving_data' => 'Falha ao recuperar dados.',
         ],
         'users' => [
             'users_empty' => 'Por favor, preencha todos os campos.',
@@ -41,11 +42,15 @@ return [
             'users_passwords_dont_match' => 'As senhas não coincidem.',
             'users_invalid_email' => 'E-mail inválido.',
         ],
+        'token' => [
+            'token_not_found' => 'Token não encontrado.',
+        ]
     ],
     'success' => [
         'users' => [
             'users_logged_in' => 'Usuário logado.',
             'user_registered' => 'Usuário registrado.',
+            'user_updated' => 'Usuário atualizado.',
         ],
     ],
     'return_keys' => [
