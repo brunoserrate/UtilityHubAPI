@@ -54,6 +54,9 @@ return [
             'user_updated' => 'Usuário atualizado.',
             'user_desactivated' => 'Usuário desativado.',
         ],
+        'general' => [
+            'data_retrieved' => 'Dados retornados com sucesso.',
+        ]
     ],
     'return_keys' => [
         'success' => 'sucesso',
