@@ -81,8 +81,7 @@ if ($renderTemplate) {
     echo $template;
 } else {
     // Return json
-    header('Content-Type: application/json');
-    header('Content-Type: text/html; charset=utf-8');
+    header('Content-Type: application/json; charset=utf-8');
 
     JsonResponser::success([
         'id' => $newUser['data']['id']

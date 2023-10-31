@@ -122,8 +122,7 @@ foreach ($statistic as $key => $value) {
 }
 
 // TODO: For future updates: Add a render template option
-header('Content-Type: application/json');
-header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: application/json; charset=utf-8');
 
 JsonResponser::success([
     $messageData['return_keys']['random_numbers']['numbers'] => $numbers,

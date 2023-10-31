@@ -123,8 +123,7 @@ if ($renderTemplate) {
     echo $template;
 } else {
     // Return json
-    header('Content-Type: application/json');
-    header('Content-Type: text/html; charset=utf-8');
+    header('Content-Type: application/json; charset=utf-8');
 
     JsonResponser::success([], $messageData['success']['users']['user_updated'], 200, $languageUsed);
 }

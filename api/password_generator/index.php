@@ -23,7 +23,7 @@ $authorization = isset($headers['Authorization']) ? $headers['Authorization'] : 
 
 // Get the post data
 if (!isset($_SESSION["requested_via_browser"]) || !$_SESSION["requested_via_browser"]) {
-    $query = $_SERVER['QUERY_STRING'];
+    $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
 
     if (!empty($query)) {
 
@@ -136,7 +136,6 @@ $password = $passwordHelper->generatePassword(
 );
 
 // TODO: For future updates: Add a render template option
-header('Content-Type: application/json');
-header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: application/json; charset=utf-8');
 
 JsonResponser::success($password, $messageData['success']['general']['data_retrieved'], 200, $languageUsed);
