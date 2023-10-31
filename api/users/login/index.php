@@ -75,6 +75,12 @@ if(empty($user)){
     die();
 }
 
+if(count($user['data']) < 1){
+    // More than one user found
+    JsonResponser::error([], $messageData['error']['users']['users_not_found'], 404, $languageUsed);
+    die();
+}
+
 $user = $user['data'][0];
 
 // Check if user is activated

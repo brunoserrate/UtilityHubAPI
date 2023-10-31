@@ -19,10 +19,10 @@ $_SESSION["requested_via_browser"] = true;
 
 <body>
     <div class="container">
-        <h1>Logado com sucesso!</h1>
+        <h1 class="titleUserRegister">Logado com sucesso!</h1>
         <p>Utilize o token abaixo para acessar a API.</p>
         <br>
-        {%token%}
+        <p class="p_token">{%token%}</p>
     </div>
 </body>
 

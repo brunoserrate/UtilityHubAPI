@@ -15,6 +15,10 @@ $_SESSION["requested_via_browser"] = true;
 
     <!-- Import css -->
     <link rel="stylesheet" href="../../public/css/default.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;300;600&display=swap" rel="stylesheet">
 </head>
 
 <script>
@@ -40,7 +44,7 @@ $_SESSION["requested_via_browser"] = true;
 
 <body>
     <div class="container">
-        <h1>Registrar</h1>
+        <h1 class="titulos">Registrar</h1>
         <p>Parar criar uma nova conta, preencha todos os campos a seguir</p>
         <br>
 

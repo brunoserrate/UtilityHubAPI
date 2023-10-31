@@ -1,0 +1,1302 @@
+openapi: 3.0.0
+servers:
+  - description: API Replit
+    url: https://ap2uni9.brunoserrate.repl.co/
+info:
+  description: |
+    UtilityHubAPI é uma API que oferece serviços úteis para simplificar tarefas do dia a dia.
+      - Conversor de Unidades: Converta facilmente entre diferentes unidades de medida, como temperatura.
+      - Gerador de Senhas: Crie senhas seguras e aleatórias com opções personalizáveis para atender às suas necessidades de segurança.
+      - Gerador de Números Aleatórios: Gere números aleatórios dentro de intervalos específicos para várias aplicações.
+
+    100% open source: https://github.com/brunoserrate/UtilityHubAPI
+
+    Obs.: A API segue um padrão de retorno: sucesso, status, mensagem, dados e tempo_resposta. Os dados varia de acordo com o tipo de requisição, por isso, verifique a documentação para saber o retorno de cada endpoint.
+
+    ²Obs.: A API também tem suporte para localização (pt-BR e en-US). Para utilizar, basta passar o parâmetro Accept-Language no header da requisição. Exemplo: Accept-Language: pt-BR
+
+  version: "1.0.0"
+  title: Utility Hub API
+  contact:
+    email: bruno.serrate@uni9.edu.br
+    name: Bruno Serrate Teixeira Jeronimo
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: Painel de Controle
+    description: Endpoints para controle (cadastro, atualização e exclusão) e login de usuários. Necessário para devolver o token.
+  - name: Gerador de Senhas
+    description: Endpoints para gerar senhas aleatórias.
+  - name: Numeros Aleatórios
+    description: Endpoints para gerar números aleatórios.
+  - name: Conversor de Unidades
+    description: Endpoints para converter unidades de medida.
+paths:
+  /api/users/register:
+    post:
+      tags:
+        - Painel de Controle
+      summary: Registra um usuário
+      operationId: register
+      description: |
+        Faz o registro de um usuário.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Register"
+        description: Registro
+      responses:
+        "200":
+          description: Usuário inserido com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserRegistered"
+        "400":
+          description: Usuário ou senha vazios! | Nome de usuário já cadastrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/UsersEmpty"
+                    - $ref: "#/components/schemas/UsersPasswordsDontMatch"
+                    - $ref: "#/components/schemas/UsersInvalidEmail"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+        "500":
+          description: Ocorreu um erro no servidor ao inserir o usuário.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/ServerError"
+  /api/users/login:
+    post:
+      tags:
+        - Painel de Controle
+      summary: Faz o login de um usuário
+      operationId: login
+      description: |
+        Faz o login de um usuário.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+        description: Login
+      responses:
+        "200":
+          description: Login efetuado com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsersLoggedIn"
+        "400":
+          description: Usuário ou senha vazios! | Usuário não encontrado! | Senha incorreta! | Usuário não está ativo!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/UsersEmpty"
+                    - $ref: "#/components/schemas/UsersNotFound"
+                    - $ref: "#/components/schemas/UsersPasswordIncorrect"
+                    - $ref: "#/components/schemas/UsersNotActivated"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+        "500":
+          description: Erro ao gerar token de acesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsersTokenNotGenerated"
+  /api/users/read:
+    get:
+      tags:
+        - Painel de Controle
+      summary: Lista usuários
+      operationId: read
+      description: |
+        Lista usuários. Os parametros são opcionais e podem ser passados tanto via query string quanto via body.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Read"
+        description: Lista usuários
+      responses:
+        "200":
+          description: Usuários listados com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DataRetrieved"
+        "404":
+          description: Token não encontrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenNotFound"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+        "500":
+          description: Erro ao recuperar dados!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FailRetrievingData"
+  /api/users/update:
+    put:
+      tags:
+        - Painel de Controle
+      summary: Atualiza um usuário
+      operationId: update
+      description: |
+        Atualiza um usuário.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Update"
+        description: Atualiza um usuário
+      responses:
+        "200":
+          description: Usuário atualizado com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserUpdated"
+        "400":
+          description: campos vazios!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/UsersEmpty"
+        "404":
+          description: Token não encontrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenNotFound"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+        "500":
+          description: Erro ao atualizar usuário!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServerError"
+  /api/users/delete:
+    delete:
+      tags:
+        - Painel de Controle
+      summary: Desativa um usuário
+      operationId: delete
+      description: |
+        Desativa um usuário.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Delete"
+        description: Desativa um usuário
+      responses:
+        "200":
+          description: Usuário desativado com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDesactivated"
+        "400":
+          description: campos vazios!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/ParametersEmpty"
+        "404":
+          description: Token não encontrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenNotFound"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+        "500":
+          description: Erro ao desativar usuário!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServerError"
+
+  /api/password_generator:
+    get:
+      tags:
+        - Gerador de Senhas
+      summary: Gera senhas aleatórias
+      operationId: password_generator
+      description: |
+        Gera senhas aleatórias de acordo com os parâmetros informados.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+        - name: length
+          in: query
+          description: Tamanho das senhas geradas
+          required: false
+          schema:
+            type: integer
+            default: 8
+        - name: samples
+          in: query
+          description: Quantidade de senhas que serão geradas
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: useLowerCase
+          in: query
+          description: Utilizar letras minúsculas na geração das senhas
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: useUpperCase
+          in: query
+          description: Utilizar letras maiúsculas na geração das senhas
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: useNumbers
+          in: query
+          description: Utilizar números na geração das senhas
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: useSymbols
+          in: query
+          description: Utilizar símbolos na geração das senhas
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: useSimilarCharacters
+          in: query
+          description: Utilizar caracteres similares na geração das senhas, como o número 0 e a letra O
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: uniqueCharacters
+          in: query
+          description: Utilizar caracteres únicos na geração das senhas (sem repetição).
+          required: false
+          schema:
+            type: boolean
+            default: false
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Senhas geradas com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PasswordGenerator"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+
+  /api/random_numbers:
+    get:
+      tags:
+        - Numeros Aleatórios
+      summary: Gera números aleatórios
+      operationId: random_number
+      description: |
+        Gera números aleatórios dentro de intervalos específicos para várias aplicações. Os parâmetros são opcionais e podem ser passados tanto via query string quanto via body.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+        - name: min
+          in: query
+          description: Valor mínimo do intervalo
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: max
+          in: query
+          description: Valor máximo do intervalo
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: samples
+          in: query
+          description: Quantidade de números que serão gerados
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: unique
+          in: query
+          description: Utilizar números únicos na geração dos números aleatórios (sem repetição).
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Números gerados com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RandomNumberData"
+        "404":
+          description: Token não encontrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenNotFound"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+
+  /api/unit_converter:
+    get:
+      tags:
+        - Conversor de Unidades
+      summary: Converte unidades de medida
+      operationId: unit_converter
+      description: |
+        Converte unidades de medida. Os parâmetros são opcionais e podem ser passados tanto via query string quanto via body.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Tipo de conversão
+          required: false
+          schema:
+            type: string
+        - name: from
+          in: query
+          description: Unidade de medida de origem
+          required: false
+          schema:
+            type: string
+        - name: to
+          in: query
+          description: Unidade de medida de destino
+          required: false
+          schema:
+            type: string
+        - name: value
+          in: query
+          description: Valor a ser convertido
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Conversão efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UnitConverterData"
+        "404":
+          description: Token não encontrado!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenNotFound"
+        "405":
+          description: Retorno para quando o método não é permitido para esse endpoint.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MethodNotAllowed"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email do usuário cadastrado
+          example: admin@admin.com.br
+        password:
+          type: string
+          description: Senha do usuário cadastrado
+          example: admin
+      required:
+        - email
+        - password
+    Register:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário
+          example: Administrador
+        email:
+          type: string
+          description: Email do usuário
+          example: admin@admin.com.br
+        password:
+          type: string
+          description: Senha do usuário
+          example: admin
+        confirm_password:
+          type: string
+          description: Confirmação da senha do usuário
+          example: admin
+      required:
+        - name
+        - email
+        - password
+        - confirmPassword
+    Read:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário
+          example: 1
+        name:
+          type: string
+          description: Nome do usuário
+          example: Administrador
+        email:
+          type: string
+          description: Email do usuário
+          example:
+        limit:
+          type: integer
+          description: Limite de usuários
+          example: 10
+    Update:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário a ser atualizado
+          example: Administrador 2
+    Delete:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário a ser desativado
+          example: 1
+
+    PasswordGenerator:
+      type: object
+      properties:
+        length:
+          type: integer
+          description: Tamanho das senhas geradas
+          example: 10
+          default: 8
+        samples:
+          type: integer
+          description: Quantidade de senhas que serão geradas
+          example: 1
+          default: 1
+        useLowerCase:
+          type: boolean
+          description: Utilizar letras minúsculas na geração das senhas
+          example: true
+          default: true
+        useUpperCase:
+          type: boolean
+          description: Utilizar letras maiúsculas na geração das senhas
+          example: true
+          default: true
+        useNumbers:
+          type: boolean
+          description: Utilizar números na geração das senhas
+          example: true
+          default: true
+        useSymbols:
+          type: boolean
+          description: Utilizar símbolos na geração das senhas
+          example: true
+          default: false
+        useSimilarCharacters:
+          type: boolean
+          description: Utilizar caracteres similares na geração das senhas, como o número 0 e a letra O
+          example: true
+          default: false
+        uniqueCharacters:
+          type: boolean
+          description: Utilizar caracteres únicos na geração das senhas (sem repetição).
+          example: true
+          default: false
+    RandomNumber:
+      type: object
+      properties:
+        min:
+          type: integer
+          description: Valor mínimo do intervalo
+          example: 1
+          default: 1
+        max:
+          type: integer
+          description: Valor máximo do intervalo
+          example: 10
+          default: 100
+        samples:
+          type: integer
+          description: Quantidade de números que serão gerados
+          example: 1
+          default: 1
+        unique:
+          type: boolean
+          description: Utilizar números únicos na geração dos números aleatórios (sem repetição).
+          example: true
+          default: false
+    UnitConverter:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de conversão
+          example: temperature
+        from:
+          type: string
+          description: Unidade de medida de origem
+          example: celsius
+        to:
+          type: string
+          description: Unidade de medida de destino
+          example: fahrenheit
+        value:
+          type: number
+          description: Valor a ser convertido
+          example: 100
+
+    PasswordGeneratorData:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Senhas geradas com sucesso!
+        dados:
+          type: array
+          description: Dados das senhas geradas. O retorno varia de acordo com o tipo de requisição
+          items:
+            type: string
+            description: Senha(s) gerada(s)
+            example: 12345678
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    RandomNumberData:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Números gerados com sucesso!
+        dados:
+          type: object
+          description: Dados dos números gerados. O retorno varia de acordo com o tipo de requisição
+          properties:
+            numeros:
+              type: array
+              description: Números gerados
+              items:
+                type: integer
+                example: 1
+            estatisitcas:
+              type: object
+              description: Estatísticas dos números gerados
+              properties:
+                saida_minima:
+                  type: integer
+                  description: Menor número gerado
+                  example: 1
+                saida_maxima:
+                  type: integer
+                  description: Maior número gerado
+                  example: 10
+                saida_media:
+                  type: integer
+                  description: Média dos números gerados
+                  example: 5.5
+                data:
+                  type: array
+                  description: Dados dos números gerados
+                  items:
+                    type: object
+                    properties:
+                      number:
+                        type: integer
+                        description: Número gerado
+                        example: 1
+                      frequency:
+                        type: integer
+                        description: Frequência do número gerado
+                        example: 1
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UnitConverterData:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Conversão efetuada com sucesso!
+        dados:
+          type: number
+          description: Dados da conversão. O retorno varia de acordo com o tipo de requisição
+          example: 212
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+
+    UsersLoggedIn:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Login efetuado com sucesso!
+        dados:
+          type: object
+          description: Dados do usuário logado. O retorno varia de acordo com o tipo de requisição
+          properties:
+            token:
+              type: string
+              description: Token de acesso
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZ
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UserRegistered:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuário inserido com sucesso!
+        dados:
+          type: object
+          description: Dados do usuário inserido. O retorno varia de acordo com o tipo de requisição
+          properties:
+            id:
+              type: integer
+              description: ID do usuário inserido
+              example: 1
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UserUpdated:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuário atualizado com sucesso!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UserDesactivated:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuário desativado com sucesso!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    DataRetrieved:
+      type: object
+      description: Retorno de dados genérico. O retorno varia de acordo com o tipo de requisição.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: true
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 200
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuários listados com sucesso!
+        dados:
+          type: object
+          description: Dados dos usuários listados. O retorno varia de acordo com o tipo de requisição
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+
+    MethodNotAllowed:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 405
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Método não permitido!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    FailRetrievingData:
+      type: object
+      description: Mensagem de erro utilizado quando há erro no servidor ao retornar algum tipo de dado. A mensagem varia de acordo com o erro do servidor.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 500
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Erro ao recuperar dados!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    ParametersEmpty:
+      type: object
+      description: Mensagem de erro utilizado quando há parâmetros vazios.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Parâmetros vazios!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersEmpty:
+      type: object
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Por favor, preencha todos os campos!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersNotFound:
+      type: object
+      description: Mensagem de erro utilizado quando o usuário não é encontrado.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuário não encontrado!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersNotActivated:
+      type: object
+      description: Mensagem de erro utilizado quando o usuário não está ativo.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 401
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Usuário não está ativo!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersPasswordIncorrect:
+      type: object
+      description: Mensagem de erro utilizado quando a senha do usuário está incorreta.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 401
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Senha incorreta!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersTokenNotGenerated:
+      type: object
+      description: Mensagem de erro utilizado quando o token não é gerado.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 500
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Erro ao gerar token de acesso!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+              example: Erro ao gerar token de acesso!
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersPasswordsDontMatch:
+      type: object
+      description: Mensagem de erro utilizado quando as senhas não conferem.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: As senhas não conferem!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+              example: As senhas não conferem!
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    UsersInvalidEmail:
+      type: object
+      description: Mensagem de erro utilizado quando o email é inválido.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Email inválido!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+              example: Email inválido!
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    TokenNotFound:
+      type: object
+      description: Mensagem de erro utilizado quando o token não é encontrado.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 401
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Token não encontrado!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+              example: Token não encontrado!
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    ConverterNotFound:
+      type: object
+      description: Mensagem de erro utilizado quando o conversor não é encontrado.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 404
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Conversor não encontrado!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    NotImplemetedYet:
+      type: object
+      description: Mensagem de erro utilizado quando o endpoint não foi implementado ainda.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 501
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Conversor não implementado ainda!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00
+    ServerError:
+      type: object
+      description: Mensagem de erro utilizado quando há erro no servidor. A mensagem varia de acordo com o erro do servidor.
+      properties:
+        sucesso:
+          type: boolean
+          description: Indica se a operação foi bem sucedida
+          example: false
+        status:
+          type: integer
+          description: Código de status da operação
+          example: 500
+        mensagem:
+          type: string
+          description: Mensagem de retorno da operação
+          example: Erro ao inserir usuário!
+        dados:
+          type: object
+          description: O retorno varia de acordo com o tipo de requisição
+          properties: {}
+        tempo_resposta:
+          type: string
+          description: Data e hora do retorno
+          example: 2021-06-20 20:00:00

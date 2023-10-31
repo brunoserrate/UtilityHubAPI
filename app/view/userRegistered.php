@@ -19,10 +19,10 @@ $_SESSION["requested_via_browser"] = true;
 
 <body>
     <div class="container">
-        <h1>Usuário registrado com sucesso!</h1>
+        <h1 class="titleUserRegister">Usuário registrado com sucesso!</h1>
         <p>Retorne para a página de login para utilizar a API!</p>
         <br>
-        <a class="button" href="../../../painel_controle/login/">
+        <a class="a_button" href="../../../painel_controle/login/">
             Login
         </a>
     </div>

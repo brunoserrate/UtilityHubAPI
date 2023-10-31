@@ -36,7 +36,7 @@ if (!isset($_SESSION["requested_via_browser"]) || !$_SESSION["requested_via_brow
 
 // Request doen't have authorization header
 if(empty($authorization)){
-    JsonResponser::error([], $messageData['error']['general']['token_not_found'], 400, $languageUsed);
+    JsonResponser::error([], $messageData['error']['token']['token_not_found'], 404, $languageUsed);
     die();
 }
 
@@ -45,6 +45,7 @@ if(empty($name)){
     die();
 }
 
+$authorization = str_replace('Bearer ', '', $authorization);
 
 // Check token
 $tokenModel = new TokenModel();
@@ -91,7 +92,7 @@ if(!$user['success']){
 
 // User not found. Need to login again
 if(empty($user['data'])){
-    JsonResponser::error([], $messageData['error']['token']['token_not_found'], 400, $languageUsed);
+    JsonResponser::error([], $messageData['error']['token']['token_not_found'], 404, $languageUsed);
     die();
 }
 
