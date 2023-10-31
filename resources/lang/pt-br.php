@@ -45,6 +45,10 @@ return [
         ],
         'token' => [
             'token_not_found' => 'Token não encontrado.',
+        ],
+        'unit_converter' => [
+            'converter_not_found' => 'Conversor não encontrado.',
+            'not_implemented_yet' => 'Ainda não implementado.',
         ]
     ],
     'success' => [
