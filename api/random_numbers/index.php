@@ -5,7 +5,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 use App\Utils\Helpers\JsonResponser;
 use App\Utils\Helpers\LocalizationHelper;
-use App\Utils\Helpers\PasswordGeneratorHelper;
+use App\Utils\Helpers\RandomNumberHelper;
 use App\Models\TokenModel;
 
 $acceptLanguage = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : null;
@@ -37,40 +37,27 @@ if (!isset($_SESSION["requested_via_browser"]) || !$_SESSION["requested_via_brow
             $queryData[$key] = $queryValue;
         }
 
-        $length = isset($queryData['length']) ? $queryData['length'] : 8;
+        $min = isset($queryData['min']) ? $queryData['min'] : 1;
+        $max = isset($queryData['max']) ? $queryData['max'] : 100;
         $samples = isset($queryData['samples']) ? $queryData['samples'] : 1;
-        $useLowerCase = isset($queryData['useLowerCase']) ? $queryData['useLowerCase'] : true;
-        $useUpperCase = isset($queryData['useUpperCase']) ? $queryData['useUpperCase'] : true;
-        $useNumbers = isset($queryData['useNumbers']) ? $queryData['useNumbers'] : true;
-        $useSymbols = isset($queryData['useSymbols']) ? $queryData['useSymbols'] : false;
-        $useSimilarCharacters = isset($queryData['useSimilarCharacters']) ? $queryData['useSimilarCharacters'] : false;
-        $uniqueCharacters = isset($queryData['uniqueCharacters']) ? $queryData['uniqueCharacters'] : false;
-
+        $unique = isset($queryData['unique']) ? $queryData['unique'] : false;
     } else {
         $body = file_get_contents('php://input');
         $body = json_decode($body, true);
 
-        $length = isset($body['length']) ? $body['length'] : 8;
+        $min = isset($body['min']) ? $body['min'] : 1;
+        $max = isset($body['max']) ? $body['max'] : 100;
         $samples = isset($body['samples']) ? $body['samples'] : 1;
-        $useLowerCase = isset($body['useLowerCase']) ? $body['useLowerCase'] : true;
-        $useUpperCase = isset($body['useUpperCase']) ? $body['useUpperCase'] : true;
-        $useNumbers = isset($body['useNumbers']) ? $body['useNumbers'] : true;
-        $useSymbols = isset($body['useSymbols']) ? $body['useSymbols'] : false;
-        $useSimilarCharacters = isset($body['useSimilarCharacters']) ? $body['useSimilarCharacters'] : false;
-        $uniqueCharacters = isset($body['uniqueCharacters']) ? $body['uniqueCharacters'] : false;
+        $unique = isset($body['unique']) ? $body['unique'] : false;
     }
 } else {
     // Get via $_GET
     $renderTemplate = true;
 
-    $length = isset($_GET['length']) ? $_GET['length'] : 8;
+    $min = isset($_GET['min']) ? $_GET['min'] : 1;
+    $max = isset($_GET['max']) ? $_GET['max'] : 100;
     $samples = isset($_GET['samples']) ? $_GET['samples'] : 1;
-    $useLowerCase = isset($_GET['useLowerCase']) ? $_GET['useLowerCase'] : true;
-    $useUpperCase = isset($_GET['useUpperCase']) ? $_GET['useUpperCase'] : true;
-    $useNumbers = isset($_GET['useNumbers']) ? $_GET['useNumbers'] : true;
-    $useSymbols = isset($_GET['useSymbols']) ? $_GET['useSymbols'] : false;
-    $useSimilarCharacters = isset($_GET['useSimilarCharacters']) ? $_GET['useSimilarCharacters'] : false;
-    $uniqueCharacters = isset($_GET['uniqueCharacters']) ? $_GET['uniqueCharacters'] : false;
+    $unique = isset($_GET['unique']) ? $_GET['unique'] : false;
 }
 
 // Request doen't have authorization header
@@ -114,29 +101,31 @@ if (empty($token['data'])) {
     die();
 }
 
-$passwordHelper = new PasswordGeneratorHelper();
-
-if($samples > 100) {
-    $samples = 100;
-}
-
-if($length > 50) {
-    $length = 50;
-}
-
-$password = $passwordHelper->generatePassword(
-    $length,
+$numbers = RandomNumberHelper::generate(
+    $min,
+    $max,
     $samples,
-    $useLowerCase,
-    $useUpperCase,
-    $useNumbers,
-    $useSymbols,
-    $useSimilarCharacters,
-    $uniqueCharacters
+    $unique
 );
+
+$statistic = RandomNumberHelper::generateStatistic($numbers);
+
+foreach ($statistic as $key => $value) {
+
+    if($messageData['return_keys']['random_numbers'][$key] == $key) continue;
+
+    $statistic[
+        $messageData['return_keys']['random_numbers'][$key]
+    ] = $statistic[$key];
+
+    unset($statistic[$key]);
+}
 
 // TODO: For future updates: Add a render template option
 header('Content-Type: application/json');
 header('Content-Type: text/html; charset=utf-8');
 
-JsonResponser::success($password, $messageData['success']['general']['data_retrieved'], 200, $languageUsed);
+JsonResponser::success([
+    $messageData['return_keys']['random_numbers']['numbers'] => $numbers,
+    $messageData['return_keys']['random_numbers']['statistic'] => $statistic
+], $messageData['success']['general']['data_retrieved'], 200, $languageUsed);

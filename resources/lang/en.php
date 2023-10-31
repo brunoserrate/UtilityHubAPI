@@ -64,6 +64,14 @@ return [
         'message' => 'message',
         'data' => 'data',
         'response_time' => 'response_time',
+        'random_numbers' => [
+            'numbers' => 'numbers',
+            'statistic' => 'statistic',
+            'min_output' => 'min_output',
+            'max_output' => 'max_output',
+            'average_output' => 'average_output',
+            'data' => 'data',
+        ]
     ],
 ];
 
